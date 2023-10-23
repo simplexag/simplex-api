@@ -35,7 +35,7 @@ class SampleEvent(SoftDeleteModel):
     date = models.DateField(default=date.today)
     type = models.CharField(max_length=1, choices=SampleTypes.choices, default=SampleTypes.SOIL,blank=False,null=False)
     number_samples = models.IntegerField(default=0)
-    depths = models.ManyToManyField(SoilSampleDepthList,related_name="sample_event_depths")
+    depths = models.ManyToManyField(SoilSampleDepthList,related_name="sample_event_depths",blank=True,null=True)
     has_results = models.BooleanField(default=False)
     has_rx = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
