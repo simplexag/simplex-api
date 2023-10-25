@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import authentication_classes, permission_classes
 from authz.permissions import HasAdminPermission
-from .models import SampleEvent
-from .serializers import SampleEventSerializer
+from .models import SampleEvent, SoilSampleDepthList
+from .serializers import SampleEventSerializer, SoilSampleDepthListSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 
 class SampleEventViewSet(viewsets.ModelViewSet):
@@ -23,3 +23,9 @@ class SampleEventViewSet(viewsets.ModelViewSet):
         if account_id is not None:
             queryset = queryset.filter(account__id=account_id).order_by('name')
         return queryset
+
+class SoilSampleDepthListViewSet(viewsets.ModelViewSet):
+    queryset = SoilSampleDepthList.objects.filter()
+    serializer_class = SoilSampleDepthListSerializer
+    permission_classes = [IsAuthenticated, HasAdminPermission]
+    http_method_names = ['get']
