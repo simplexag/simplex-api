@@ -1,10 +1,11 @@
 from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
-from .views import SampleEventViewSet, SoilSampleDepthListViewSet
+from .views import SampleEventViewSet, SoilSampleDepthListViewSet, SamplesSoilSerializerListViewSet
 
 router = DefaultRouter()
 router.register(r'account/(?P<account>[A-Za-z0-9_-]+)/sampleEvents', SampleEventViewSet, basename='Core')
 router.register(r'SoilSampleDepths', SoilSampleDepthListViewSet, basename='Core')
+router.register(r'account/(?P<account>[A-Za-z0-9_-]+)/sampleEvents/(?P<event>[A-Za-z0-9_-]+)/samples', SamplesSoilSerializerListViewSet, basename='Core')
 
 #router.register(r'account/(?P<account>[A-Za-z0-9_-]+)/farmBoundaries', FarmLocationList, basename='Core')
 urlpatterns = [
