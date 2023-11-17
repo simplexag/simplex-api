@@ -6,7 +6,8 @@ from django.contrib.gis.db import models
 from core.models import Account, Organization, Field
 from datetime import date
 from django.contrib.postgres.fields import ArrayField
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 #All depth is stored in cm, these are combinations of depths a sample can be part of 
 class SoilSampleDepthList(SoftDeleteModel):
@@ -21,12 +22,29 @@ class SoilSampleDepthList(SoftDeleteModel):
 
 ###### Soil Extraction Reference Tables
 class StandardSoilElements(SoftDeleteModel):
+    #Enum for the different Standards
+    class StandardSource(models.TextChoices):
+        MODUS = 'MODUS', 'Modus'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=50,blank=False,null=False)
+    source = models.CharField(max_length=10, choices=StandardSource.choices, default=StandardSource.MODUS, blank=False,null=False)
+    
+    def __str__(self):
+        return str(self.code)
 
 class StandardSoilExtractions(SoftDeleteModel):
+    #Enum for the different Standards
+    class StandardSource(models.TextChoices):
+        MODUS = 'MODUS', 'Modus'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=50,blank=False,null=False)
+    source = models.CharField(max_length=10, choices=StandardSource.choices, default=StandardSource.MODUS, blank=False,null=False)
+    soil_std_element = models.ForeignKey(StandardSoilElements, on_delete=models.CASCADE, blank=False, null=False)
+    
+    def __str__(self):
+        return str(self.code)
 
 class SoilElement(SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -34,11 +52,20 @@ class SoilElement(SoftDeleteModel):
     full_name = models.CharField(max_length=20,blank=False,null=False)
     std_related = models.ManyToManyField(StandardSoilElements,related_name="std_soil_elements",blank=True,null=True)
 
+    def __str__(self):
+        return str(self.display_name)
+
 class SoilExtraction(SoftDeleteModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     display_name = models.CharField(max_length=20,blank=False,null=False)
     full_name = models.CharField(max_length=20,blank=False,null=False)
+    units = ArrayField(models.CharField(max_length=20))
+    soil_element = models.ForeignKey(SoilElement, on_delete=models.CASCADE, blank=False, null=False)
     std_related = models.ManyToManyField(StandardSoilExtractions,related_name="std_soil_extractions",blank=True,null=True)
+    
+    def __str__(self):
+        return str(self.display_name)
+
 ###### End Soil Extraction Reference Tables
 
 #Holds all sample event types
@@ -68,7 +95,7 @@ class SampleEvent(SoftDeleteModel):
         ordering = ['date']
 
     def __str__(self):
-        return self.field.farm.grower,self.field.farm,self.field,self.name
+        return '%s %s %s %s'%(self.field.farm.grower,self.field.farm,self.field,self.name)
 
 #Model for individual soil samples
 class SamplesSoil(SoftDeleteModel):
@@ -80,7 +107,7 @@ class SamplesSoil(SoftDeleteModel):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.sample_event.name
+        return self.sample_event.name, self.label
 
 #Model for each depth of a soil samples
 class SampleSoilDepth(SoftDeleteModel):
@@ -102,9 +129,17 @@ class SampleSoilResults(SoftDeleteModel):
         VH = 'VH', 'Very High'
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    depth = models.ForeignKey(SampleSoilDepth, on_delete=models.CASCADE, blank=False, null=False)
-    element = models.ForeignKey(SoilElement, on_delete=models.CASCADE ,blank=False, null=False)
+    depth = models.ForeignKey(SampleSoilDepth, on_delete=models.CASCADE, blank=False, null=False, related_name='soil_results')
     extraction = models.ForeignKey(SoilExtraction, on_delete=models.CASCADE, blank=False, null=False)
     value = models.FloatField(blank=False,null=False)
     unit = models.CharField(max_length=20,blank=False,null=False)
-    value_description = models.CharField(max_length=2, choices=ValueDescriptions.choices, default=ValueDescriptions.VL,blank=True,null=True)
+    value_description = models.CharField(max_length=2, choices=ValueDescriptions.choices, default=None,blank=True,null=True)
+
+    def __str__(self):
+        return '%s %s %s'%(self.id,self.depth.id,self.extraction.display_name)
+
+@receiver(post_save, sender=SampleSoilResults)
+def update_event_model(sender, instance, **kwargs):
+    event = instance.depth.sample.sample_event
+    event.has_results = True
+    event.save()
