@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import SoilSampleDepthList, SampleEvent, SamplesSoil, SampleSoilDepth, SoilElement, StandardSoilElements, SoilExtraction, StandardSoilExtractions, SampleSoilResults
-from core.models import Account, Field
 # Register your models here.
 
 class SoilSampleDepthListAdmin(admin.ModelAdmin):
