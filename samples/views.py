@@ -7,14 +7,23 @@ from authz.permissions import HasAdminPermission
 from .models import SampleEvent, SoilSampleDepthList, SamplesSoil, SoilExtraction, SampleSoilResults
 from .serializers import SampleEventSerializer, SoilSampleDepthListSerializer, SamplesSoilSerializer, SoilExtractionSerializer, SampleSoilResultsSerializer, SampleEventSoilDetailSerializer
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter
 
 class SampleEventViewSet(viewsets.ModelViewSet):
     queryset = SampleEvent.objects.filter()
     serializer_class = SampleEventSerializer
     permission_classes = [IsAuthenticated, HasAdminPermission]
     
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['organization','field','field__farm','field__farm__grower']
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = {
+       'date': ['exact', 'lte', 'gte'],
+       'organization': ['exact'],
+       'field': ['exact'],
+       'field__farm': ['exact'],
+       'field__farm__grower': ['exact'],
+       'has_results':['exact'],
+       'type':['exact'],
+   } 
     ordering_fields = ['date']
 
     def get_queryset(self):
