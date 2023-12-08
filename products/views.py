@@ -4,11 +4,22 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from authz.permissions import HasAdminPermission
 
-from .models import AccountProducts
-from .serializers import AccountProductsListSerializer, AccountProductsDetailSerializer
+from .models import AccountProducts, AccountProductsDefaults
+from .serializers import AccountProductsListSerializer, AccountProductsDetailSerializer, AccountProductsDefaultsSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 
+
+class AccountProductsDefaultsSerializerViewSet(viewsets.ModelViewSet):
+    queryset = AccountProductsDefaults.objects.filter()
+    serializer_class = AccountProductsDefaultsSerializer
+    permission_classes = [IsAuthenticated, HasAdminPermission]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        account_id = self.kwargs.get('account')
+        queryset = queryset.filter(account__id=account_id)
+        return queryset
 
 class AccountProductsListSerializerViewSet(viewsets.ModelViewSet):
     queryset = AccountProducts.objects.filter()

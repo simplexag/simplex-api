@@ -5,7 +5,7 @@ from django_restql.mixins import DynamicFieldsMixin
 class StandardSoilRxElementsSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
         model = StandardSoilRxElements
-        fields = ('id','display_name','full_name','order')
+        fields = ('id','display_name','full_name','order','default_min_rate','default_max_rate','default_switch_rate','default_rate_unit')
 
 class StandardRxCropsSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     class Meta:
@@ -88,7 +88,7 @@ class EquationElementListSerializer(DynamicFieldsMixin, serializers.ModelSeriali
     element_name = serializers.CharField(source='element.display_name')
     class Meta:
         model = EquationElement
-        fields = ('id','element_name')
+        fields = ('id','element_name','element_id')
 
 class EquationCropsListSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     equation_elements = EquationElementListSerializer(many=True, read_only=True)

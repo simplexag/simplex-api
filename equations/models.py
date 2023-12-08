@@ -10,6 +10,10 @@ class StandardSoilRxElements(SoftDeleteObject, models.Model):
     display_name = models.CharField(max_length=20,blank=False,null=False)
     full_name = models.CharField(max_length=50,blank=False,null=False)
     order = models.IntegerField()
+    default_min_rate = models.FloatField(blank=True, null=True)
+    default_max_rate = models.FloatField(blank=True, null=True)
+    default_switch_rate = models.FloatField(blank=True, null=True)
+    default_rate_unit = models.CharField(max_length=20,blank=False,null=False)
 
     class Meta:
         ordering = ['order']
