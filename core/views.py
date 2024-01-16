@@ -77,6 +77,23 @@ class GrowerViewSet(viewsets.ModelViewSet):
         if account_id is not None:
             queryset = queryset.filter(account__id=account_id).order_by('name')
         return queryset
+    
+    def create(self, request, *args, **kwargs):
+        # Check if the request data is a list
+        is_many = isinstance(request.data, list)
+
+        # If it's a list, serialize and create each object
+        if is_many:
+            serializer = self.get_serializer(data=request.data, many=True)
+        else:
+            serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Return the serialized data
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
 
 class FarmViewSet(viewsets.ModelViewSet):
     queryset = Farm.objects.filter()
@@ -92,6 +109,24 @@ class FarmViewSet(viewsets.ModelViewSet):
         if account_id is not None:
             queryset = queryset.filter(account__id=account_id).order_by('name')
         return queryset
+    
+    def create(self, request, *args, **kwargs):
+        # Check if the request data is a list
+        is_many = isinstance(request.data, list)
+
+        # If it's a list, serialize and create each object
+        if is_many:
+            serializer = self.get_serializer(data=request.data, many=True)
+        else:
+            serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Return the serialized data
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
+
 
 class FieldViewSet(viewsets.ModelViewSet):
     queryset = Field.objects.filter()
@@ -107,17 +142,24 @@ class FieldViewSet(viewsets.ModelViewSet):
         if account_id is not None:
             queryset = queryset.filter(account__id=account_id).order_by('name')
         return queryset
-    """
-    Use this to make a request and get object with id as key
-    def list(self, request, *args, **kwargs):  # Override list method to list the data as a dictionary instead of array
-        response = super().list(request, *args, **kwargs)  # Call the original 'list'
-        response_dict = {}
-        for item in response.data:
-            idKey = item.pop('id')  # Remove id from list to use it as key instead
-            response_dict[idKey] = item
-        response.data = response_dict  # Customize response data into dictionary with id as keys instead of using array
-        return response  # Return response with this custom representation
-    """
+
+    def create(self, request, *args, **kwargs):
+        # Check if the request data is a list
+        is_many = isinstance(request.data, list)
+
+        # If it's a list, serialize and create each object
+        if is_many:
+            serializer = self.get_serializer(data=request.data, many=True)
+        else:
+            serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Return the serialized data
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=201, headers=headers)
+
 class FarmLocationList(generics.ListAPIView):
 
     queryset = Field.objects.filter()

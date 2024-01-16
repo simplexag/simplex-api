@@ -78,7 +78,7 @@ class SamplesSoilSerializerListViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
 class SampleSoilResultsSerializerViewSet(viewsets.ModelViewSet):
-    queryset = SampleSoilResults.objects.filter(is_deleted=False)
+    queryset = SampleSoilResults.objects.filter()
     serializer_class = SampleSoilResultsSerializer
     permission_classes = [IsAuthenticated, HasAdminPermission]
 

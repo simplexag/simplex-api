@@ -69,7 +69,7 @@ class SoilExtraction(SoftDeleteModel):
 ###### End Soil Extraction Reference Tables
 
 #Holds all sample event types
-class SampleEvent(SoftDeleteModel):
+class SampleEvent(models.Model):
     #Enum for the different 
     class SampleTypes(models.TextChoices):
         SOIL = 'S', 'Soil'
@@ -98,7 +98,7 @@ class SampleEvent(SoftDeleteModel):
         return '%s %s %s %s'%(self.field.farm.grower,self.field.farm,self.field,self.name)
 
 #Model for individual soil samples
-class SamplesSoil(SoftDeleteModel):
+class SamplesSoil(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sample_event = models.ForeignKey(SampleEvent, on_delete=models.CASCADE,  related_name='samples_soil')
     label = models.CharField(max_length=25,blank=False,null=False)
@@ -107,19 +107,19 @@ class SamplesSoil(SoftDeleteModel):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.sample_event.name, self.label
+        return '%s %s'%(self.sample_event.name, self.label)
 
 #Model for each depth of a soil samples
-class SampleSoilDepth(SoftDeleteModel):
+class SampleSoilDepth(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sample = models.ForeignKey(SamplesSoil, on_delete=models.CASCADE, related_name='depths')
     sample_depth = models.ForeignKey(SoilSampleDepthList, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.sample.sample_event.name, self.sample_depth.name
+        return '%s %s'%(self.sample.sample_event.name, self.sample_depth.name)
 
 #Model for each lab result of a soil samples at a depth
-class SampleSoilResults(SoftDeleteModel):
+class SampleSoilResults(models.Model):
     #Enum for the different Value discriptions
     class ValueDescriptions(models.TextChoices):
         VL = 'VL', 'Very Low'

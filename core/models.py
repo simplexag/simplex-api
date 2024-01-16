@@ -1,7 +1,7 @@
 import uuid
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
-from django_softdelete.models import SoftDeleteModel
+from softdelete.models import SoftDeleteObject
 from django.db.models import Q
 from django.contrib.gis.db import models
 
@@ -31,7 +31,7 @@ class AccoutUsers(models.Model):
     def __str__(self):
         return self.user
 
-class Organization(SoftDeleteModel):
+class Organization(SoftDeleteObject):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     parent = models.ForeignKey('self', on_delete=models.CASCADE,blank=True,null=True)
@@ -40,18 +40,11 @@ class Organization(SoftDeleteModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['account', 'name'],
-                condition=Q(is_deleted=False),
-                name='organization_unique_if_not_deleted')
-        ]
-    
+
     def __str__(self):
         return self.name
 
-class Grower(SoftDeleteModel):
+class Grower(SoftDeleteObject):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
@@ -69,6 +62,7 @@ class Grower(SoftDeleteModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    """
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -76,11 +70,13 @@ class Grower(SoftDeleteModel):
                 condition=Q(is_deleted=False),
                 name='grower_unique_if_not_deleted')
         ]
+    """
 
     def __str__(self):
         return self.name
     
-class Farm(SoftDeleteModel):
+    
+class Farm(SoftDeleteObject):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     grower = models.ForeignKey(Grower, on_delete=models.CASCADE)
@@ -91,6 +87,7 @@ class Farm(SoftDeleteModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    """
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -98,11 +95,12 @@ class Farm(SoftDeleteModel):
                 condition=Q(is_deleted=False),
                 name='farm_unique_if_not_deleted')
         ]
-
+    """
     def __str__(self):
         return self.name
+    
 
-class Field(SoftDeleteModel):
+class Field(SoftDeleteObject):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     farm = models.ForeignKey(Farm, on_delete=models.CASCADE)
@@ -114,6 +112,7 @@ class Field(SoftDeleteModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    """
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -121,6 +120,7 @@ class Field(SoftDeleteModel):
                 condition=Q(is_deleted=False),
                 name='field_unique_if_not_deleted')
         ]
+    """
 
     def __str__(self):
         return self.name

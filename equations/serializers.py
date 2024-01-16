@@ -106,9 +106,10 @@ class EquationSetsListSerializer(DynamicFieldsMixin, serializers.ModelSerializer
 class EquationElementDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     element_name = serializers.CharField(source='element.display_name')
     crop_name = serializers.CharField(source='crop.crop.display_name')
+    crop_id = serializers.CharField(source='crop.crop.id')
     set_name = serializers.CharField(source='crop.set.name')
     set_type = serializers.CharField(source='crop.set.type')
     set_source = serializers.CharField(source='crop.set.source')
     class Meta:
         model = EquationElement
-        fields = ('id','element_name','crop_name','set_name','set_type','set_source','inputs','code','output_unit')
+        fields = ('id','element_name','crop_name','crop_id','set_name','set_type','set_source','inputs','code','output_unit')
